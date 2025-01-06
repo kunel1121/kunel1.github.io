@@ -53,7 +53,7 @@
             background-color: #f0f0f0;
         }
 
-        .bus-box, .route-box {
+        .bus-box {
             margin-left: 1rem;
         }
 
@@ -1760,23 +1760,38 @@
                         stopBox.textContent = stop.정류장;
 
                         stopBox.addEventListener('click', function () {
-                            resultsBox.innerHTML = ''; // 기존 결과 초기화
+                            const existingBusBoxes = stopBox.querySelectorAll('.bus-box');
+                            if (existingBusBoxes.length > 0) {
+                                existingBusBoxes.forEach(box => box.remove());
+                                return;
+                            }
 
                             stop.버스정보.forEach(bus => {
                                 const busBox = document.createElement('div');
                                 busBox.className = 'bus-box';
                                 busBox.innerHTML = `<strong>${bus.시간}</strong> - ${bus.노선명}`;
 
-                                busBox.addEventListener('click', function () {
+                                busBox.addEventListener('click', function (e) {
+                                    const existingRouteBox = busBox.querySelector('.route-box');
+                                    if (existingRouteBox) {
+                                        existingRouteBox.remove();
+                                        return;
+                                    }
+
                                     const routeBox = document.createElement('div');
                                     routeBox.className = 'route-box';
                                     routeBox.textContent = bus.경유지;
 
-                                    // 경유지 추가
+                                    routeBox.addEventListener('click', function (e) {
+                                        routeBox.remove(); // 클릭 시 경유지 박스를 닫음
+                                        e.stopPropagation();
+                                    });
+
                                     busBox.appendChild(routeBox);
+                                    e.stopPropagation();
                                 });
 
-                                resultsBox.appendChild(busBox);
+                                stopBox.appendChild(busBox);
                             });
                         });
 
